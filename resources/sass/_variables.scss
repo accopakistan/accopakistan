@@ -1,0 +1,30 @@
+// ACCO Pakistan brand palette — overrides Bootstrap's defaults before it compiles.
+
+$deep-blue: #0a2647;
+$charcoal: #1f2937;
+$light-gray: #f5f6f8;
+$construction-yellow: #f2b705;
+$medical-blue: #2e86ab;
+$sustainability-green: #2e7d32;
+
+$primary: $deep-blue;
+$secondary: $charcoal;
+$success: $sustainability-green;
+$warning: $construction-yellow;
+$info: $medical-blue;
+$light: $light-gray;
+$dark: $charcoal;
+
+$font-family-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$headings-font-family: 'Poppins', $font-family-sans-serif;
+$headings-font-weight: 600;
+
+$border-radius: 0.5rem;
+$border-radius-sm: 0.35rem;
+$border-radius-lg: 0.75rem;
+
+$enable-shadows: false;
+$enable-gradients: false;
+
+$link-color: $primary;
+$link-hover-color: darken($primary, 10%);

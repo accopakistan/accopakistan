@@ -1,0 +1,159 @@
+.site {
+
+    .hero {
+        position: relative;
+        height: 100svh;
+        min-height: 38rem;
+        display: flex;
+        align-items: flex-end;
+        color: var(--c-white);
+        overflow: hidden;
+
+        .hero__media {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transform: scale(1.08);
+            }
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(7, 26, 51, 0.35) 0%, rgba(7, 26, 51, 0.35) 45%, rgba(7, 26, 51, 0.94) 100%);
+            }
+        }
+
+        .hero__content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding-bottom: clamp(3rem, 8vw, 6rem);
+        }
+
+        .hero__eyebrow {
+            margin-bottom: 1.5rem;
+        }
+
+        .hero__title {
+            max-width: 52rem;
+            overflow: hidden;
+        }
+
+        .hero__title .line {
+            display: block;
+            overflow: hidden;
+
+            span {
+                display: block;
+                transform: translateY(110%);
+            }
+        }
+
+        .hero__sub {
+            max-width: 34rem;
+            margin-top: 1.75rem;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .hero__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .hero__scroll {
+            position: absolute;
+            bottom: 2rem;
+            right: var(--edge);
+            z-index: 1;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.7rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.75);
+
+            @media (min-width: 700px) {
+                display: inline-flex;
+            }
+
+            .hero__scroll-line {
+                width: 1px;
+                height: 3rem;
+                background: rgba(255, 255, 255, 0.35);
+                position: relative;
+                overflow: hidden;
+
+                &::after {
+                    content: '';
+                    position: absolute;
+                    top: -100%;
+                    left: 0; right: 0;
+                    height: 100%;
+                    background: #fff;
+                    animation: heroScroll 2s ease-in-out infinite;
+                }
+            }
+        }
+    }
+
+    // Secondary, shorter hero used on interior pages (services/projects/blog headers)
+    .page-hero {
+        position: relative;
+        min-height: 26rem;
+        display: flex;
+        align-items: flex-end;
+        color: var(--c-white);
+        padding-top: var(--header-h);
+        overflow: hidden;
+
+        .page-hero__media {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            &::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(180deg, rgba(7, 26, 51, 0.45) 0%, rgba(7, 26, 51, 0.88) 100%);
+            }
+        }
+
+        .page-hero__content {
+            position: relative;
+            z-index: 1;
+            padding-block: clamp(2.5rem, 6vw, 4.5rem);
+        }
+
+        .breadcrumb {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 1.25rem;
+
+            a:hover { color: var(--c-white); }
+        }
+    }
+}
+
+@keyframes heroScroll {
+    0% { top: -100%; }
+    100% { top: 100%; }
+}

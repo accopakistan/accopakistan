@@ -1,0 +1,76 @@
+.site {
+
+    .field {
+        position: relative;
+        margin-bottom: 1.75rem;
+    }
+
+    .field label {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--fg-muted);
+        margin-bottom: 0.6rem;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        background: transparent;
+        padding: 0.65rem 0;
+        font-size: 1rem;
+        font-family: var(--font-sans);
+        color: var(--fg);
+        transition: border-color var(--dur-fast) var(--ease);
+        resize: vertical;
+
+        &:focus {
+            outline: none;
+            border-bottom-color: var(--c-ink);
+        }
+
+        &::placeholder { color: var(--c-line); }
+    }
+
+    .field-error {
+        font-size: 0.8rem;
+        color: #b3423d;
+        margin-top: 0.4rem;
+    }
+
+    .field-hint {
+        font-size: 0.8rem;
+        color: var(--fg-muted);
+        margin-top: 0.4rem;
+    }
+
+    .form-note {
+        font-size: 0.85rem;
+        padding: 1rem 1.25rem;
+        border-radius: 2px;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-note--success {
+        background: #eef4ec;
+        color: #33562f;
+    }
+
+    .form-note--error {
+        background: #f7ebea;
+        color: #8a3b36;
+    }
+
+    .honeypot {
+        position: absolute;
+        left: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+}

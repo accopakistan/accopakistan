@@ -1,0 +1,136 @@
+// Reset + foundational elements for the public site only.
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+body.site {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+img, video {
+    max-width: 100%;
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+ul, ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+::selection {
+    background: var(--c-ink);
+    color: var(--c-white);
+}
+
+// Focus visibility (accessibility)
+:focus-visible {
+    outline: 2px solid var(--c-gold);
+    outline-offset: 3px;
+}
+
+.site {
+
+    .container {
+        max-width: var(--container-max);
+        margin-inline: auto;
+        padding-inline: var(--edge);
+    }
+
+    .container--narrow {
+        max-width: 56rem;
+    }
+
+    .container--wide {
+        max-width: 100rem;
+    }
+
+    main {
+        display: block;
+    }
+
+    section {
+        position: relative;
+    }
+}
+
+// Fluid vertical rhythm for full sections.
+.section {
+    padding-block: clamp(4.5rem, 9vw, 9rem);
+}
+
+.section--tight {
+    padding-block: clamp(3rem, 6vw, 5.5rem);
+}
+
+// 12-column grid system
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--gutter);
+}
+
+@for $i from 1 through 12 {
+    .col-#{$i} {
+        grid-column: span #{$i};
+    }
+}
+
+@media (max-width: 900px) {
+    @for $i from 1 through 12 {
+        .col-#{$i} {
+            grid-column: span 12;
+        }
+    }
+    .col-md-6 { grid-column: span 12; }
+}
+
+@media (min-width: 901px) {
+    @for $i from 1 through 12 {
+        .col-md-#{$i} {
+            grid-column: span #{$i};
+        }
+    }
+}
+
+.lazy-img {
+    opacity: 0;
+    transition: opacity var(--dur) var(--ease);
+
+    &.is-loaded,
+    &[src] {
+        opacity: 1;
+    }
+}

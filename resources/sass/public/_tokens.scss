@@ -1,0 +1,57 @@
+// ACCO Pakistan — public site design tokens.
+// A bespoke system, independent of Bootstrap. Nothing here is imported by the admin bundle.
+
+:root {
+    // Palette — restrained, premium, architecture-firm neutral.
+    --c-white: #ffffff;
+    --c-paper: #f7f6f3;
+    --c-mist: #eeece7;
+    --c-line: #dedad2;
+    --c-stone: #8b8578;
+    --c-charcoal: #262420;
+    --c-ink: #161512;
+    --c-black: #0a0908;
+
+    // Brand accents
+    --c-navy: #0c2a4d;
+    --c-navy-deep: #071a33;
+    --c-gold: #b08d4f;
+    --c-gold-light: #d3b483;
+    --c-medical: #2e6da4;
+
+    // Semantic aliases
+    --bg: var(--c-white);
+    --bg-alt: var(--c-paper);
+    --fg: var(--c-ink);
+    --fg-muted: var(--c-stone);
+    --border: var(--c-line);
+    --accent: var(--c-gold);
+
+    // Type
+    --font-display: 'Fraunces', 'Georgia', serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    // Layout
+    --header-h: 5.5rem;
+    --container-max: 90rem;
+    --edge: clamp(1.25rem, 4vw, 4rem);
+    --gutter: clamp(1rem, 2vw, 2rem);
+
+    // Motion
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur-fast: 0.3s;
+    --dur: 0.6s;
+    --dur-slow: 1s;
+}
+
+:root[data-theme='healthcare'] {
+    --accent: var(--c-medical);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --dur-fast: 0.001s;
+        --dur: 0.001s;
+        --dur-slow: 0.001s;
+    }
+}
