@@ -45,6 +45,7 @@ class RolePermissionSeeder extends Seeder
         'integrations' => ['view', 'manage'],
         'backups' => ['view', 'manage'],
         'logs' => ['view'],
+        'ai_assistant' => ['view', 'use'],
     ];
 
     /**

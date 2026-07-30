@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\AiAssistantController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\BlogCategoryController;
 use App\Http\Controllers\Admin\BlogPostController;
@@ -217,4 +218,9 @@ Route::middleware('permission:backups.view')->group(function () {
 Route::middleware('permission:backups.manage')->group(function () {
     Route::post('/backups/run', [BackupController::class, 'run'])->name('backups.run');
     Route::delete('/backups', [BackupController::class, 'destroy'])->name('backups.destroy');
+});
+
+// AI Assistant
+Route::middleware('permission:ai_assistant.view')->group(function () {
+    Route::get('/ai-assistant', [AiAssistantController::class, 'index'])->name('ai-assistant.index');
 });

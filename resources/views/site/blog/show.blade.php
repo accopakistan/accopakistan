@@ -1,5 +1,22 @@
 @php
-    $paragraphs = collect(explode("\n", $post->content ?? ''))->map(fn ($p) => trim($p))->filter()->values();
+    $rawContent = $post->content ?? '';
+    $isHtml = strip_tags($rawContent) !== $rawContent;
+
+    $paragraphs = collect();
+    $headings = collect();
+    $renderedContent = $rawContent;
+
+    if ($isHtml) {
+        $headingIndex = 0;
+        $renderedContent = preg_replace_callback('/<(h1|h2)([^>]*)>(.*?)<\/\1>/is', function ($m) use (&$headings, &$headingIndex) {
+            $id = 'section-'.$headingIndex++;
+            $headings->push(['id' => $id, 'text' => trim(strip_tags($m[3]))]);
+
+            return '<h2'.$m[2].' id="'.$id.'">'.$m[3].'</h2>';
+        }, $rawContent);
+    } else {
+        $paragraphs = collect(explode("\n", $rawContent))->map(fn ($p) => trim($p))->filter()->values();
+    }
 @endphp
 
 <x-site-layout :seoable="$post" :title="$post->title" :description="$post->excerpt">
@@ -26,9 +43,13 @@
                 @endif
 
                 <div class="prose">
-                    @foreach ($paragraphs as $i => $paragraph)
-                        <p id="section-{{ $i }}">{{ $paragraph }}</p>
-                    @endforeach
+                    @if ($isHtml)
+                        {!! $renderedContent !!}
+                    @else
+                        @foreach ($paragraphs as $i => $paragraph)
+                            <p id="section-{{ $i }}">{{ $paragraph }}</p>
+                        @endforeach
+                    @endif
                 </div>
 
                 @if ($post->tags->isNotEmpty())
@@ -50,9 +71,15 @@
             <aside class="toc">
                 <div class="toc__heading">{{ __('In This Article') }}</div>
                 <nav class="toc__list">
-                    @foreach ($paragraphs->take(6) as $i => $paragraph)
-                        <a href="#section-{{ $i }}" data-toc-link>{{ \Illuminate\Support\Str::words($paragraph, 6, '…') }}</a>
-                    @endforeach
+                    @if ($isHtml)
+                        @foreach ($headings->take(6) as $heading)
+                            <a href="#{{ $heading['id'] }}" data-toc-link>{{ \Illuminate\Support\Str::limit($heading['text'], 40) }}</a>
+                        @endforeach
+                    @else
+                        @foreach ($paragraphs->take(6) as $i => $paragraph)
+                            <a href="#section-{{ $i }}" data-toc-link>{{ \Illuminate\Support\Str::words($paragraph, 6, '…') }}</a>
+                        @endforeach
+                    @endif
                 </nav>
 
                 @if ($relatedPosts->isNotEmpty())

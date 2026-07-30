@@ -133,6 +133,12 @@
             </a>
         @endcan
 
+        @can('ai_assistant.view')
+            <a href="{{ route('admin.ai-assistant.index') }}" class="nav-link {{ request()->routeIs('admin.ai-assistant.*') ? 'active' : '' }}">
+                <i class="bi bi-stars"></i> {{ __('AI Assistant') }}
+            </a>
+        @endcan
+
         <hr class="border-secondary my-3">
 
         <a href="{{ route('dashboard') }}" class="nav-link">

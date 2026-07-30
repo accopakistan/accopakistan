@@ -9,13 +9,21 @@
     <section class="section">
         <div class="container project-layout">
             <div>
+                @php
+                    $projectRawContent = $project->content ?? '';
+                    $projectIsHtml = strip_tags($projectRawContent) !== $projectRawContent;
+                @endphp
                 <div class="eyebrow reveal-up">{{ __('Overview') }}</div>
                 <div class="prose reveal-up" style="margin-top:1.5rem;">
-                    @foreach (explode("\n", $project->content ?? '') as $paragraph)
-                        @if (trim($paragraph) !== '')
-                            <p>{{ $paragraph }}</p>
-                        @endif
-                    @endforeach
+                    @if ($projectIsHtml)
+                        {!! preg_replace('/<h1(\s[^>]*)?>(.*?)<\/h1>/is', '<h2$1>$2</h2>', $projectRawContent) !!}
+                    @else
+                        @foreach (explode("\n", $projectRawContent) as $paragraph)
+                            @if (trim($paragraph) !== '')
+                                <p>{{ $paragraph }}</p>
+                            @endif
+                        @endforeach
+                    @endif
                 </div>
 
                 @if ($project->scope)
