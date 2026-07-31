@@ -15,4 +15,12 @@ return [
     'max_tool_iterations' => 8,
 
     'api_url' => 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+
+    // Used by the generate_blog_post_image tool. Gemini's own image model
+    // (gemini-3.1-flash-image) has a hard free-tier limit of zero requests —
+    // confirmed via a live 429 response — so this uses Pollinations.ai
+    // instead: genuinely free, no API key or billing required.
+    'image_api_url' => 'https://image.pollinations.ai/prompt',
+    'image_width' => 1200,
+    'image_height' => 800,
 ];

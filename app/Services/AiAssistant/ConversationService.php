@@ -132,6 +132,9 @@ class ConversationService
           the <h1>. Structure body content with <h2>/<h3> for sections, plain
           <p> paragraphs, and <table>/<ul>/<ol> where useful -- but never
           include an <h1> in the content field itself.
+        - When asked to add or generate an image for a blog post, use
+          generate_blog_post_image with a specific visual prompt describing
+          the subject, setting, and style -- not the post title verbatim.
         PROMPT;
     }
 

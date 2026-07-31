@@ -3,6 +3,7 @@
 namespace App\Services\AiAssistant\Tools;
 
 use App\Models\BlogPost;
+use App\Services\AiAssistant\ImageGenerationClient;
 use Illuminate\Support\Str;
 
 class BlogPostTools
@@ -185,6 +186,50 @@ class BlogPostTools
                     $post->saveSeo($data);
 
                     return ['success' => true, 'id' => $post->id, 'seo' => $data];
+                },
+            ],
+            [
+                'name' => 'generate_blog_post_image',
+                'description' => 'Generate a featured image for a blog post from a text description and attach it to the post. Replaces any existing featured image. Write a specific, visual prompt (subject, setting, style) — not the blog post title.',
+                'input_schema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'integer'],
+                        'prompt' => [
+                            'type' => 'string',
+                            'description' => 'A specific visual description of the image to generate, e.g. "Photorealistic exterior of a modern hospital building in Pakistan at golden hour, architectural photography style."',
+                        ],
+                    ],
+                    'required' => ['id', 'prompt'],
+                ],
+                'handler' => function (array $input): array {
+                    $post = BlogPost::find($input['id'] ?? null);
+
+                    if (! $post) {
+                        return ['error' => 'Blog post not found.'];
+                    }
+
+                    if (empty($input['prompt'])) {
+                        return ['error' => 'A prompt is required to generate an image.'];
+                    }
+
+                    $image = app(ImageGenerationClient::class)->generate($input['prompt']);
+
+                    $extension = match ($image['mime_type']) {
+                        'image/jpeg' => 'jpg',
+                        'image/webp' => 'webp',
+                        default => 'png',
+                    };
+
+                    $post->addMediaFromString($image['data'])
+                        ->usingFileName("blog-{$post->id}-featured.{$extension}")
+                        ->toMediaCollection('featured_image');
+
+                    return [
+                        'success' => true,
+                        'id' => $post->id,
+                        'featured_image_url' => $post->fresh()->featuredImageUrl(),
+                    ];
                 },
             ],
         ];
