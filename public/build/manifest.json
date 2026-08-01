@@ -1,0 +1,32 @@
+{
+  "resources/js/app.js": {
+    "file": "assets/app-CG-GrKiD.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/public.js": {
+    "file": "assets/public-BprVa2vo.js",
+    "name": "public",
+    "src": "resources/js/public.js",
+    "isEntry": true
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-BfZ1HkDI.css",
+    "src": "resources/sass/app.scss",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/sass/public.scss": {
+    "file": "assets/public-C7_J7Kcy.css",
+    "src": "resources/sass/public.scss",
+    "isEntry": true,
+    "name": "public",
+    "names": [
+      "public.css"
+    ]
+  }
+}
