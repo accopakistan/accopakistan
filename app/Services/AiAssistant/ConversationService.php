@@ -72,17 +72,26 @@ class ConversationService
 
     /**
      * Simplified turns for the chat UI: only user/assistant text, tool activity
-     * collapsed into a short note so the transcript stays readable.
+     * collapsed into a short note (with an inline image preview for
+     * generate_blog_post_image calls) so the transcript stays readable.
      */
     public function displayHistory(User $user): array
     {
-        return AiAssistantMessage::where('user_id', $user->id)
-            ->orderBy('id')
-            ->get()
+        $rows = AiAssistantMessage::where('user_id', $user->id)->orderBy('id')->get();
+
+        // tool_call_id => decoded tool result, so assistant turns can look up
+        // what a tool call actually returned (e.g. a generated image URL).
+        $toolResults = $rows->where('role', 'tool')->mapWithKeys(function (AiAssistantMessage $m) {
+            return [$m->content['tool_call_id'] => json_decode($m->content['content'] ?? '{}', true) ?: []];
+        });
+
+        return $rows
             ->filter(fn (AiAssistantMessage $m) => in_array($m->role, ['user', 'assistant'], true))
-            ->map(function (AiAssistantMessage $m) {
+            ->map(function (AiAssistantMessage $m) use ($toolResults) {
                 $text = $m->content['content'] ?? '';
-                $toolNote = $this->extractToolNote($m->content['tool_calls'] ?? null);
+                $toolCalls = $m->content['tool_calls'] ?? null;
+                $toolNote = $this->extractToolNote($toolCalls);
+                $imageUrl = $this->extractGeneratedImageUrl($toolCalls, $toolResults);
 
                 if ($text === '' && $toolNote === '') {
                     return null;
@@ -92,6 +101,7 @@ class ConversationService
                     'role' => $m->role,
                     'text' => $text ?? '',
                     'tool_note' => $toolNote,
+                    'image_url' => $imageUrl,
                     'created_at' => $m->created_at,
                 ];
             })
@@ -135,6 +145,13 @@ class ConversationService
         - When asked to add or generate an image for a blog post, use
           generate_blog_post_image with a specific visual prompt describing
           the subject, setting, and style -- not the post title verbatim.
+          The prompt must stay tightly on-topic with the post: name the
+          actual building type, location, and architectural details from the
+          post (e.g. "modern hospital exterior with glass facade" not just
+          "healthcare"), specify "architectural photography" or "professional
+          construction photography" style, and never include people/portraits
+          unless the post is specifically about people. A generic or vague
+          prompt risks generating an unrelated image.
         PROMPT;
     }
 
@@ -185,5 +202,26 @@ class ConversationService
         $names = array_filter(array_map(fn (array $call) => $call['function']['name'] ?? null, $toolCalls));
 
         return empty($names) ? '' : 'Used: '.implode(', ', $names);
+    }
+
+    protected function extractGeneratedImageUrl(?array $toolCalls, \Illuminate\Support\Collection $toolResults): ?string
+    {
+        if (empty($toolCalls)) {
+            return null;
+        }
+
+        foreach ($toolCalls as $call) {
+            if (($call['function']['name'] ?? null) !== 'generate_blog_post_image') {
+                continue;
+            }
+
+            $result = $toolResults->get($call['id']);
+
+            if (! empty($result['featured_image_url'])) {
+                return $result['featured_image_url'];
+            }
+        }
+
+        return null;
     }
 }

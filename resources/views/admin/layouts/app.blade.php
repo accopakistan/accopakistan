@@ -23,10 +23,10 @@
         <div class="admin-wrapper">
             @include('admin.layouts.partials.sidebar')
 
-            <div class="admin-content d-flex flex-column">
+            <div class="admin-content d-flex flex-column {{ $fullHeight ? 'admin-content--full-height' : '' }}">
                 @include('admin.layouts.partials.topbar')
 
-                <main class="flex-grow-1 p-3 p-lg-4">
+                <main class="flex-grow-1 {{ $fullHeight ? 'admin-main--full-height' : 'p-3 p-lg-4' }}">
                     @isset($header)
                         <div class="mb-4">
                             {{ $header }}
@@ -34,7 +34,7 @@
                     @endisset
 
                     @if (session('status'))
-                        <div class="alert alert-success">{{ session('status') }}</div>
+                        <div class="alert alert-success {{ $fullHeight ? 'm-3 mb-0' : '' }}">{{ session('status') }}</div>
                     @endif
 
                     {{ $slot }}

@@ -1,28 +1,21 @@
 <div class="ai-chat-wrapper">
-    <div class="ai-chat-intro mb-3">
-        <div class="ai-chat-intro-icon"><i class="bi bi-stars"></i></div>
-        <p class="text-muted small mb-0">
-            {{ __('Ask the assistant to update site content — settings, blog posts, services, projects, FAQs, and testimonials. It cannot delete anything; deletions must be done manually in the admin panel.') }}
-        </p>
+    <div class="ai-chat-card-header">
+        <div class="ai-chat-header-icon"><i class="bi bi-stars"></i></div>
+        <div>
+            <div class="fw-semibold small">{{ __('ACCO AI') }}</div>
+            <div class="text-muted" style="font-size: 0.75rem;">{{ __('Content Assistant') }}</div>
+        </div>
     </div>
 
     @if ($error)
-        <div class="alert alert-danger py-2 small d-flex align-items-start gap-2">
+        <div class="alert alert-danger py-2 px-3 mb-0 rounded-0 small d-flex align-items-start gap-2 flex-shrink-0">
             <i class="bi bi-exclamation-triangle-fill mt-1"></i>
             <div>{{ $error }}</div>
         </div>
     @endif
 
-    <div class="ai-chat-card card border-0 shadow-sm">
-        <div class="ai-chat-card-header">
-            <span class="d-flex align-items-center gap-2 fw-semibold small">
-                <i class="bi bi-stars text-warning"></i> {{ __('ACCO AI') }}
-                <span class="text-muted fw-normal">&middot; {{ __('Content Assistant') }}</span>
-            </span>
-            <span class="badge text-bg-light border small fw-normal">{{ __('Beta') }}</span>
-        </div>
-
-        <div id="ai-chat-scroll" class="ai-chat-messages">
+    <div id="ai-chat-scroll" class="ai-chat-scroll">
+        <div class="ai-chat-messages">
             @forelse ($history as $turn)
                 <div class="ai-msg-row {{ $turn['role'] === 'user' ? 'ai-msg-row--user' : '' }}">
                     <div class="ai-avatar {{ $turn['role'] === 'user' ? 'ai-avatar--user' : 'ai-avatar--assistant' }}">
@@ -31,7 +24,16 @@
                     <div class="ai-bubble-col">
                         <div class="ai-bubble {{ $turn['role'] === 'user' ? 'ai-bubble--user' : 'ai-bubble--assistant' }}">
                             @if ($turn['text'] !== '')
-                                {{ $turn['text'] }}
+                                @if ($turn['role'] === 'assistant')
+                                    <div class="ai-bubble-markdown">{!! \Illuminate\Support\Str::markdown($turn['text'], ['html_input' => 'strip']) !!}</div>
+                                @else
+                                    <div class="ai-bubble-plain">{{ $turn['text'] }}</div>
+                                @endif
+                            @endif
+                            @if (! empty($turn['image_url']))
+                                <a href="{{ $turn['image_url'] }}" target="_blank" rel="noopener">
+                                    <img src="{{ $turn['image_url'] }}" alt="{{ __('Generated image') }}" class="ai-bubble-image">
+                                </a>
                             @endif
                             @if ($turn['tool_note'] !== '')
                                 <div class="ai-bubble-tool-note">
@@ -63,47 +65,69 @@
                 </div>
             @endforelse
 
-            <div wire:loading wire:target="send" class="ai-msg-row">
+            <div wire:loading.flex wire:target="send" class="ai-msg-row" style="display: none;">
                 <div class="ai-avatar ai-avatar--assistant"><i class="bi bi-stars"></i></div>
                 <div class="ai-bubble-col">
                     <div class="ai-bubble ai-bubble--assistant">
-                        <span class="ai-typing-dots text-muted"><span></span><span></span><span></span></span>
+                        <span class="ai-typing-dots"><span></span><span></span><span></span></span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="ai-chat-input-bar card-footer">
-            <form wire:submit="send" class="d-flex gap-2 align-items-start">
+    <div class="ai-chat-input-bar">
+        <div class="ai-chat-input-inner">
+            <form wire:submit="send" class="ai-composer" x-data @submit="scrollChatToBottom()">
                 <textarea
                     wire:model="message"
-                    rows="2"
-                    class="form-control @error('message') is-invalid @enderror"
-                    placeholder="{{ __('Type a request…') }}"
+                    rows="1"
+                    class="ai-composer-input"
+                    placeholder="{{ __('Message ACCO AI…') }}"
                     wire:loading.attr="disabled"
                     wire:target="send"
-                    x-data
-                    @keydown.enter.prevent="if (!$event.shiftKey) { $wire.send(); }"
+                    x-init="$el.style.height = 'auto'"
+                    @input="$el.style.height = 'auto'; $el.style.height = Math.min($el.scrollHeight, 192) + 'px'"
+                    @keydown.enter.prevent="if (!$event.shiftKey) { $el.closest('form').requestSubmit(); }"
                 ></textarea>
-                <button type="submit" class="btn btn-primary" wire:loading.attr="disabled" wire:target="send">
-                    <i class="bi bi-send"></i> {{ __('Send') }}
+                <button type="submit" class="ai-composer-send" wire:loading.attr="disabled" wire:target="send" aria-label="{{ __('Send') }}">
+                    <i class="bi bi-arrow-up-lg"></i>
                 </button>
             </form>
-            @error('message') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+            <div class="ai-composer-hint">{{ __('AI-generated content can be wrong — review before publishing. It cannot delete anything.') }}</div>
+            @error('message') <div class="text-danger small mt-1 text-center">{{ $message }}</div> @enderror
         </div>
     </div>
 </div>
 
 @script
 <script>
-    const scrollToBottom = () => {
-        let el = document.getElementById('ai-chat-scroll');
-        if (el) {
-            el.scrollTop = el.scrollHeight;
-        }
+    // Instant, direct scrollTop assignment — deliberately not scrollTo({behavior:
+    // 'smooth'}) or scrollIntoView(), which can silently no-op if a scroll is
+    // already in flight or the element hasn't painted yet. Runs across a couple
+    // of animation frames so it still lands correctly after Livewire morphs the
+    // message list in (new, taller content) a moment after the DOM patch.
+    window.scrollChatToBottom = () => {
+        const scroll = () => {
+            let el = document.getElementById('ai-chat-scroll');
+            if (el) el.scrollTop = el.scrollHeight;
+        };
+
+        scroll();
+        requestAnimationFrame(() => requestAnimationFrame(scroll));
     };
 
-    scrollToBottom();
-    $wire.on('ai-assistant-message-sent', () => setTimeout(scrollToBottom, 50));
+    // Initial load: jump straight to the bottom of the existing conversation.
+    scrollChatToBottom();
+
+    // After a reply lands (success or error), scroll again and reset the
+    // composer's auto-grown height back down.
+    $wire.on('ai-assistant-message-sent', () => {
+        let input = document.querySelector('.ai-composer-input');
+        if (input) input.style.height = 'auto';
+
+        scrollChatToBottom();
+        setTimeout(scrollChatToBottom, 150);
+    });
 </script>
 @endscript

@@ -190,14 +190,14 @@ class BlogPostTools
             ],
             [
                 'name' => 'generate_blog_post_image',
-                'description' => 'Generate a featured image for a blog post from a text description and attach it to the post. Replaces any existing featured image. Write a specific, visual prompt (subject, setting, style) — not the blog post title.',
+                'description' => 'Generate a featured image for a blog post from a text description and attach it to the post. Replaces any existing featured image. The prompt must be specific and stay on-topic with the post: name the actual building type, setting, and architectural details, and specify "architectural photography" or "professional construction photography" style. Do not use the post title verbatim, do not write a vague/generic prompt, and do not include people unless the post is specifically about people — vague prompts risk generating an unrelated image (e.g. a random person instead of a building).',
                 'input_schema' => [
                     'type' => 'object',
                     'properties' => [
                         'id' => ['type' => 'integer'],
                         'prompt' => [
                             'type' => 'string',
-                            'description' => 'A specific visual description of the image to generate, e.g. "Photorealistic exterior of a modern hospital building in Pakistan at golden hour, architectural photography style."',
+                            'description' => 'A specific visual description of the image to generate, e.g. "Photorealistic exterior of a modern multi-story hospital building with glass facade in Lahore, Pakistan, at golden hour, professional architectural photography, no people."',
                         ],
                     ],
                     'required' => ['id', 'prompt'],

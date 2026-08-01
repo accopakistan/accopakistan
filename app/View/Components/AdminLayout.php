@@ -7,6 +7,11 @@ use Illuminate\View\View;
 
 class AdminLayout extends Component
 {
+    public function __construct(
+        public bool $fullHeight = false,
+    ) {
+    }
+
     /**
      * Get the view / contents that represents the component.
      */
