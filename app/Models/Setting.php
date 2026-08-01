@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class Setting extends Model
 {
@@ -39,6 +40,16 @@ class Setting extends Model
         }
 
         return static::castValue($settings->get($key));
+    }
+
+    /**
+     * URL for an image-type setting, or a fallback if it isn't set.
+     */
+    public static function imageUrl(string $key, string $fallback): string
+    {
+        $path = static::get($key);
+
+        return $path ? Storage::disk('public')->url($path) : $fallback;
     }
 
     public static function set(string $key, mixed $value, string $group = 'general', string $type = 'string'): self

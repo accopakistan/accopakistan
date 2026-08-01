@@ -1,7 +1,7 @@
 <x-site-layout :seoable="$jobPosting" :title="$jobPosting->title" :description="\Illuminate\Support\Str::limit(strip_tags($jobPosting->description), 160)">
     <x-page-header
         :title="$jobPosting->title"
-        image="https://picsum.photos/seed/acco-careers-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('careers_header_image', 'https://picsum.photos/seed/acco-careers-header/1920/900')"
         :breadcrumbs="[__('Careers') => route('careers.index'), $jobPosting->title => null]"
     >
         <x-slot:subtitle>

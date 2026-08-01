@@ -142,16 +142,19 @@ class ConversationService
           the <h1>. Structure body content with <h2>/<h3> for sections, plain
           <p> paragraphs, and <table>/<ul>/<ol> where useful -- but never
           include an <h1> in the content field itself.
-        - When asked to add or generate an image for a blog post, use
-          generate_blog_post_image with a specific visual prompt describing
-          the subject, setting, and style -- not the post title verbatim.
-          The prompt must stay tightly on-topic with the post: name the
-          actual building type, location, and architectural details from the
-          post (e.g. "modern hospital exterior with glass facade" not just
-          "healthcare"), specify "architectural photography" or "professional
-          construction photography" style, and never include people/portraits
-          unless the post is specifically about people. A generic or vague
-          prompt risks generating an unrelated image.
+        - When asked to add or generate an image for a blog post, service, or
+          project, use generate_blog_post_image / generate_service_image /
+          generate_project_image with a specific visual prompt describing the
+          subject, setting, and style -- not the title verbatim. The prompt
+          must stay tightly on-topic with the record: name the actual
+          building type, location, and architectural details (e.g. "modern
+          hospital exterior with glass facade" not just "healthcare"),
+          specify "architectural photography" or "professional construction
+          photography" style, and never include people/portraits unless the
+          record is specifically about people. A generic or vague prompt
+          risks generating an unrelated image. These tools do not apply to
+          team member photos or client logos -- those represent real people
+          and companies and must stay real uploads, never AI-generated.
         PROMPT;
     }
 

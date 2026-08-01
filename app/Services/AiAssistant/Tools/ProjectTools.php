@@ -3,6 +3,7 @@
 namespace App\Services\AiAssistant\Tools;
 
 use App\Models\Project;
+use App\Services\AiAssistant\ImageGenerationClient;
 use Illuminate\Support\Str;
 
 class ProjectTools
@@ -162,6 +163,50 @@ class ProjectTools
                     $project->update($data);
 
                     return static::summarize($project->refresh());
+                },
+            ],
+            [
+                'name' => 'generate_project_image',
+                'description' => 'Generate a featured image for a portfolio project from a text description and attach it to the project. Replaces any existing featured image. The prompt must be specific and stay on-topic with the project: name the actual building type, location, and architectural details, and specify "architectural photography" or "professional construction photography" style. Do not use the project title verbatim, do not write a vague/generic prompt, and do not include people unless relevant.',
+                'input_schema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'integer'],
+                        'prompt' => [
+                            'type' => 'string',
+                            'description' => 'A specific visual description of the image to generate, e.g. "Photorealistic exterior of a completed multi-story hospital building with modern glass facade in Rawalpindi, Pakistan, daytime, professional architectural photography."',
+                        ],
+                    ],
+                    'required' => ['id', 'prompt'],
+                ],
+                'handler' => function (array $input): array {
+                    $project = Project::find($input['id'] ?? null);
+
+                    if (! $project) {
+                        return ['error' => 'Project not found.'];
+                    }
+
+                    if (empty($input['prompt'])) {
+                        return ['error' => 'A prompt is required to generate an image.'];
+                    }
+
+                    $image = app(ImageGenerationClient::class)->generate($input['prompt']);
+
+                    $extension = match ($image['mime_type']) {
+                        'image/jpeg' => 'jpg',
+                        'image/webp' => 'webp',
+                        default => 'png',
+                    };
+
+                    $project->addMediaFromString($image['data'])
+                        ->usingFileName("project-{$project->id}-featured.{$extension}")
+                        ->toMediaCollection('featured_image');
+
+                    return [
+                        'success' => true,
+                        'id' => $project->id,
+                        'featured_image_url' => $project->fresh()->featuredImageUrl(),
+                    ];
                 },
             ],
         ];

@@ -3,6 +3,7 @@
 namespace App\Services\AiAssistant\Tools;
 
 use App\Models\Service;
+use App\Services\AiAssistant\ImageGenerationClient;
 use Illuminate\Support\Str;
 
 class ServiceTools
@@ -146,6 +147,50 @@ class ServiceTools
                     $service->update($data);
 
                     return static::summarize($service->refresh());
+                },
+            ],
+            [
+                'name' => 'generate_service_image',
+                'description' => 'Generate a featured image for a service from a text description and attach it to the service. Replaces any existing featured image. The prompt must be specific and stay on-topic with the service: name the actual work/setting shown and specify "architectural photography" or "professional construction photography" style. Do not use the service title verbatim, do not write a vague/generic prompt, and do not include people unless relevant.',
+                'input_schema' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'integer'],
+                        'prompt' => [
+                            'type' => 'string',
+                            'description' => 'A specific visual description of the image to generate, e.g. "Architects and engineers reviewing structural blueprints over a construction site model, professional architectural photography, no faces visible."',
+                        ],
+                    ],
+                    'required' => ['id', 'prompt'],
+                ],
+                'handler' => function (array $input): array {
+                    $service = Service::find($input['id'] ?? null);
+
+                    if (! $service) {
+                        return ['error' => 'Service not found.'];
+                    }
+
+                    if (empty($input['prompt'])) {
+                        return ['error' => 'A prompt is required to generate an image.'];
+                    }
+
+                    $image = app(ImageGenerationClient::class)->generate($input['prompt']);
+
+                    $extension = match ($image['mime_type']) {
+                        'image/jpeg' => 'jpg',
+                        'image/webp' => 'webp',
+                        default => 'png',
+                    };
+
+                    $service->addMediaFromString($image['data'])
+                        ->usingFileName("service-{$service->id}-featured.{$extension}")
+                        ->toMediaCollection('featured_image');
+
+                    return [
+                        'success' => true,
+                        'id' => $service->id,
+                        'featured_image_url' => $service->fresh()->featuredImageUrl(),
+                    ];
                 },
             ],
         ];

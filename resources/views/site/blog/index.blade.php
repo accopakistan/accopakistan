@@ -8,7 +8,7 @@
         :eyebrow="__('Insights')"
         :title="__('Our Journal')"
         subtitle="Project stories, industry analysis, and design thinking from ACCO's architects and engineers."
-        image="https://picsum.photos/seed/acco-blog-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('blog_header_image', 'https://picsum.photos/seed/acco-blog-header/1920/900')"
         :breadcrumbs="[__('Insights') => null]"
     />
 

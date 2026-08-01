@@ -5,7 +5,7 @@
         :eyebrow="__('Get In Touch')"
         :title="__('Contact Us')"
         subtitle="Tell us about your project. Our team typically responds within one business day."
-        image="https://picsum.photos/seed/acco-contact-header/1920/900"
+        :image="Setting::imageUrl('contact_header_image', 'https://picsum.photos/seed/acco-contact-header/1920/900')"
         :breadcrumbs="[__('Contact') => null]"
     />
 

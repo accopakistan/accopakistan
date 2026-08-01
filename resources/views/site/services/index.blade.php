@@ -3,7 +3,7 @@
         :eyebrow="__('What We Do')"
         :title="__('Our Services')"
         subtitle="Full design-build capability, delivered by one accountable team — from first sketch to final handover."
-        image="https://picsum.photos/seed/acco-services-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('services_header_image', 'https://picsum.photos/seed/acco-services-header/1920/900')"
         :breadcrumbs="[__('Services') => null]"
     />
 

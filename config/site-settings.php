@@ -150,4 +150,13 @@ return [
         'privacy_policy_content' => ['type' => 'text', 'label' => 'Privacy Policy Content', 'default' => "This Privacy Policy describes how ACCO Pakistan collects, uses, and protects information submitted through this website. We collect information you provide via our contact, quotation, and career forms, and use it solely to respond to your inquiry or application. We do not sell or share your information with third parties except as required to provide the services you have requested. Contact us at the email address listed on this site with any privacy questions."],
         'terms_content' => ['type' => 'text', 'label' => 'Terms & Conditions Content', 'default' => 'By using this website, you agree to use its content and services for lawful purposes only. All content, trademarks, and materials on this site are the property of ACCO Pakistan unless otherwise stated. We make reasonable efforts to keep information accurate but do not guarantee completeness. Contact us for any questions about these terms.'],
     ],
+    'page_headers' => [
+        'blog_header_image' => ['type' => 'image', 'label' => 'Blog Listing Page — Header Banner'],
+        'services_header_image' => ['type' => 'image', 'label' => 'Services Listing Page — Header Banner'],
+        'projects_header_image' => ['type' => 'image', 'label' => 'Projects Listing Page — Header Banner'],
+        'about_header_image' => ['type' => 'image', 'label' => 'About Page — Header Banner'],
+        'contact_header_image' => ['type' => 'image', 'label' => 'Contact Page — Header Banner'],
+        'careers_header_image' => ['type' => 'image', 'label' => 'Careers Page — Header Banner'],
+        'faqs_header_image' => ['type' => 'image', 'label' => 'FAQs Page — Header Banner'],
+    ],
 ];

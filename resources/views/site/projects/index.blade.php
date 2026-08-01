@@ -3,7 +3,7 @@
         :eyebrow="__('Our Work')"
         :title="__('Projects Portfolio')"
         subtitle="Commercial towers, hospitals, industrial plants, and residences — delivered across Pakistan."
-        image="https://picsum.photos/seed/acco-projects-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('projects_header_image', 'https://picsum.photos/seed/acco-projects-header/1920/900')"
         :breadcrumbs="[__('Projects') => null]"
     />
 

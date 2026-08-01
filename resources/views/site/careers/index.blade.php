@@ -3,7 +3,7 @@
         :eyebrow="__('Join Our Team')"
         :title="__('Open Positions')"
         subtitle="We are always looking for talented architects, engineers, and construction professionals."
-        image="https://picsum.photos/seed/acco-careers-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('careers_header_image', 'https://picsum.photos/seed/acco-careers-header/1920/900')"
         :breadcrumbs="[__('Careers') => null]"
     />
 

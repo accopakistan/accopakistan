@@ -2,7 +2,7 @@
     <x-page-header
         :eyebrow="__('Help Center')"
         :title="__('Frequently Asked Questions')"
-        image="https://picsum.photos/seed/acco-faq-header/1920/900"
+        :image="\App\Models\Setting::imageUrl('faqs_header_image', 'https://picsum.photos/seed/acco-faq-header/1920/900')"
         :breadcrumbs="[__('FAQs') => null]"
     />
 

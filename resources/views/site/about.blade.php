@@ -4,7 +4,7 @@
     <x-page-header
         :eyebrow="__('About Us')"
         :title="Setting::get('about_heading')"
-        image="https://picsum.photos/seed/acco-about-header/1920/900"
+        :image="Setting::imageUrl('about_header_image', 'https://picsum.photos/seed/acco-about-header/1920/900')"
         :breadcrumbs="[__('About') => null]"
     />
 
@@ -12,7 +12,7 @@
     <section class="section">
         <div class="container row-editorial">
             <div class="row-editorial__media reveal-mask">
-                <img src="{{ Setting::get('about_image') ? \Illuminate\Support\Facades\Storage::disk('public')->url(Setting::get('about_image')) : 'https://picsum.photos/seed/acco-about/1200/1500' }}" alt="{{ Setting::get('site_name') }}" loading="lazy">
+                <img src="{{ Setting::imageUrl('about_image', 'https://picsum.photos/seed/acco-about/1200/1500') }}" alt="{{ Setting::get('site_name') }}" loading="lazy">
             </div>
             <div class="reveal-up">
                 <div class="eyebrow">{{ __('Our Story') }}</div>
