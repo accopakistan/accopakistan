@@ -109,9 +109,9 @@
                 @endforeach
 
                 @if ($otherServices->isNotEmpty())
-                    <div class="mega__list" style="margin-top:1rem;">
+                    <div class="more-list">
                         @foreach ($otherServices as $service)
-                            <a href="{{ route('services.show', $service) }}" class="mega__item" style="border-color:var(--border);">
+                            <a href="{{ route('services.show', $service) }}" class="more-list__item">
                                 {{ $service->title }}
                                 <span>{{ sprintf('%02d', $loop->iteration) }}</span>
                             </a>

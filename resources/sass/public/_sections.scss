@@ -124,6 +124,43 @@
         }
     }
 
+    // --- Inline list of remaining items (e.g. non-featured services) -----
+
+    .more-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem 2.5rem;
+        margin-top: 1rem;
+
+        @media (max-width: 700px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .more-list__item {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.9rem 0;
+        border-bottom: 1px solid var(--border);
+        font-family: var(--font-display);
+        font-size: 1.15rem;
+
+        span {
+            font-family: var(--font-sans);
+            font-size: 0.7rem;
+            color: var(--fg-muted);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        &:hover {
+            color: var(--accent);
+        }
+    }
+
     // --- Project tiles (masonry-ish asymmetric grid) ---------------------
 
     .project-grid {
