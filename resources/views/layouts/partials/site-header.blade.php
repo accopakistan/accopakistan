@@ -41,7 +41,7 @@
                     {{ $phone }}
                 </a>
             @endif
-            <a href="{{ route('contact') }}" class="btn btn--outline-light btn--sm d-none-mobile" style="color:inherit;border-color:currentColor;">
+            <a href="{{ route('contact') }}" class="btn btn--outline-light btn--sm d-none-mobile">
                 {{ __('Start a Project') }}
             </a>
             <button type="button" class="burger" data-menu-toggle aria-expanded="false" aria-controls="mobileMenu" aria-label="{{ __('Open menu') }}">

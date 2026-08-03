@@ -29,7 +29,10 @@ class BlogController extends Controller
 
     public function show(BlogPost $post): View
     {
-        abort_unless($post->status === 'published', 404);
+        abort_unless(
+            $post->status === 'published' && ($post->published_at === null || $post->published_at->lte(now())),
+            404
+        );
 
         $post->load('seo', 'category', 'author', 'tags');
 

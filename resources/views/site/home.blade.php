@@ -94,7 +94,7 @@
                             <div class="row-editorial__index">{{ sprintf('%02d', $loop->iteration) }} / {{ sprintf('%02d', $featuredServices->count()) }}</div>
                             <h3 class="display-3">{{ $service->title }}</h3>
                             <p class="lede" style="margin-top:1rem;">{{ $service->excerpt }}</p>
-                            <a href="{{ route('services.show', $service) }}" class="btn btn--outline" style="margin-top:1.75rem;border-color:var(--border);">
+                            <a href="{{ route('services.show', $service) }}" class="btn btn--outline" style="margin-top:1.75rem;">
                                 {{ __('Learn More') }} <x-icon name="arrow-right" />
                             </a>
                         </div>

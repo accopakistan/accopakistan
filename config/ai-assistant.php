@@ -21,6 +21,6 @@ return [
     // confirmed via a live 429 response — so this uses Pollinations.ai
     // instead: genuinely free, no API key or billing required.
     'image_api_url' => 'https://image.pollinations.ai/prompt',
-    'image_width' => 1200,
-    'image_height' => 800,
+    'image_width' => 1920,
+    'image_height' => 1080,
 ];

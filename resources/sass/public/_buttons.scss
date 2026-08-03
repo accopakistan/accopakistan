@@ -34,32 +34,38 @@
     }
 
     .btn--primary {
-        background: var(--c-ink);
+        background: var(--accent);
         color: var(--c-white);
+        border-color: var(--accent);
 
         &:hover {
-            background: var(--accent);
-            color: var(--c-ink);
+            background: var(--c-white);
+            color: var(--accent);
+            border-color: var(--accent);
         }
     }
 
     .btn--gold {
         background: var(--accent);
-        color: var(--c-ink);
+        color: var(--c-white);
+        border-color: var(--accent);
 
         &:hover {
-            background: var(--c-ink);
-            color: var(--c-white);
+            background: var(--c-white);
+            color: var(--accent);
+            border-color: var(--accent);
         }
     }
 
     .btn--outline {
-        border-color: currentColor;
+        border-color: var(--c-ink);
+        color: var(--c-ink);
         background: transparent;
 
         &:hover {
-            background: currentColor;
-            color: var(--c-ink);
+            background: var(--accent);
+            color: var(--c-white);
+            border-color: var(--accent);
         }
     }
 

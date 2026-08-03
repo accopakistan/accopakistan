@@ -90,7 +90,7 @@ class BlogPostTools
             ],
             [
                 'name' => 'create_blog_post',
-                'description' => 'Create a new blog post. A URL slug is auto-generated from the title if not provided. Defaults to draft status.',
+                'description' => 'Create a new blog post. A URL slug is auto-generated from the title if not provided. Defaults to draft status. You can schedule the post by passing a future datetime in published_at.',
                 'input_schema' => [
                     'type' => 'object',
                     'properties' => [
@@ -99,10 +99,18 @@ class BlogPostTools
                         'content' => ['type' => 'string', 'description' => 'Full HTML or plain-text article body.'],
                         'status' => ['type' => 'string', 'description' => '"draft" or "published". Defaults to "draft".'],
                         'is_featured' => ['type' => 'boolean'],
+                        'published_at' => ['type' => 'string', 'description' => 'Optional ISO 8601 datetime format (YYYY-MM-DD HH:MM:SS) to schedule the post to publish in the future. If empty or not provided, defaults to immediately.'],
                     ],
                     'required' => ['title'],
                 ],
                 'handler' => function (array $input): array {
+                    $publishedAt = null;
+                    if (! empty($input['published_at'])) {
+                        $publishedAt = \Illuminate\Support\Carbon::parse($input['published_at']);
+                    } elseif (($input['status'] ?? 'draft') === 'published') {
+                        $publishedAt = now();
+                    }
+
                     $post = BlogPost::create([
                         'title' => $input['title'],
                         'slug' => static::uniqueSlug($input['title']),
@@ -110,7 +118,7 @@ class BlogPostTools
                         'content' => $input['content'] ?? null,
                         'status' => $input['status'] ?? 'draft',
                         'is_featured' => (bool) ($input['is_featured'] ?? false),
-                        'published_at' => ($input['status'] ?? 'draft') === 'published' ? now() : null,
+                        'published_at' => $publishedAt,
                     ]);
 
                     return static::summarize($post);
@@ -118,7 +126,7 @@ class BlogPostTools
             ],
             [
                 'name' => 'update_blog_post',
-                'description' => 'Update fields on an existing blog post by id. Only pass the fields you want to change.',
+                'description' => 'Update fields on an existing blog post by id. Only pass the fields you want to change. You can schedule or reschedule by passing published_at.',
                 'input_schema' => [
                     'type' => 'object',
                     'properties' => [
@@ -128,6 +136,7 @@ class BlogPostTools
                         'content' => ['type' => 'string'],
                         'status' => ['type' => 'string', 'description' => '"draft" or "published".'],
                         'is_featured' => ['type' => 'boolean'],
+                        'published_at' => ['type' => 'string', 'description' => 'Optional ISO 8601 datetime format (YYYY-MM-DD HH:MM:SS) to schedule or reschedule the publication.'],
                     ],
                     'required' => ['id'],
                 ],
@@ -140,7 +149,11 @@ class BlogPostTools
 
                     $data = array_intersect_key($input, array_flip(['title', 'excerpt', 'content', 'status', 'is_featured']));
 
-                    if (isset($data['status']) && $data['status'] === 'published' && ! $post->published_at) {
+                    if (array_key_exists('published_at', $input)) {
+                        $data['published_at'] = ! empty($input['published_at'])
+                            ? \Illuminate\Support\Carbon::parse($input['published_at'])
+                            : null;
+                    } elseif (isset($data['status']) && $data['status'] === 'published' && ! $post->published_at) {
                         $data['published_at'] = now();
                     }
 

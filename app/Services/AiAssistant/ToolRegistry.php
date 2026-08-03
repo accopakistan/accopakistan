@@ -3,10 +3,15 @@
 namespace App\Services\AiAssistant;
 
 use App\Services\AiAssistant\Tools\BlogPostTools;
+use App\Services\AiAssistant\Tools\CareerTools;
+use App\Services\AiAssistant\Tools\ClientTools;
+use App\Services\AiAssistant\Tools\DownloadTools;
 use App\Services\AiAssistant\Tools\FaqTools;
+use App\Services\AiAssistant\Tools\LeadTools;
 use App\Services\AiAssistant\Tools\ProjectTools;
 use App\Services\AiAssistant\Tools\ServiceTools;
 use App\Services\AiAssistant\Tools\SettingsTools;
+use App\Services\AiAssistant\Tools\TeamMemberTools;
 use App\Services\AiAssistant\Tools\TestimonialTools;
 use Throwable;
 
@@ -24,6 +29,11 @@ class ToolRegistry
             ProjectTools::class,
             FaqTools::class,
             TestimonialTools::class,
+            ClientTools::class,
+            TeamMemberTools::class,
+            DownloadTools::class,
+            CareerTools::class,
+            LeadTools::class,
         ];
     }
 

@@ -19,6 +19,8 @@ class ConversationService
      */
     public function reply(User $user, string $userMessage): string
     {
+        @set_time_limit(300);
+
         AiAssistantMessage::create([
             'user_id' => $user->id,
             'role' => 'user',
@@ -112,11 +114,15 @@ class ConversationService
 
     protected function systemPrompt(): string
     {
-        return <<<'PROMPT'
+        $now = now()->toDateTimeString();
+
+        return <<<PROMPT
         You are the AI content assistant embedded in the admin panel of the ACCO Pakistan
         website, a Laravel CMS for an architecture, engineering, and construction firm.
         You help the admin manage site content -- settings, blog posts, services, projects,
         FAQs, and testimonials -- using only the tools available to you.
+
+        Today's current date and time is: {$now} (use this to accurately calculate relative dates/times when scheduling posts).
 
         Rules:
         - Only act through the provided tools. Never invent ids, slugs, or values --
@@ -214,14 +220,22 @@ class ConversationService
         }
 
         foreach ($toolCalls as $call) {
-            if (($call['function']['name'] ?? null) !== 'generate_blog_post_image') {
+            $name = $call['function']['name'] ?? null;
+            if (! in_array($name, ['generate_blog_post_image', 'generate_service_image', 'generate_project_image', 'generate_setting_image'], true)) {
                 continue;
             }
 
             $result = $toolResults->get($call['id']);
+            if (empty($result)) {
+                continue;
+            }
 
             if (! empty($result['featured_image_url'])) {
                 return $result['featured_image_url'];
+            }
+
+            if (! empty($result['value'])) {
+                return $result['value'];
             }
         }
 

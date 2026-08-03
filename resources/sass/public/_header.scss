@@ -19,6 +19,17 @@
             -webkit-backdrop-filter: blur(14px);
             border-bottom-color: var(--border);
             color: var(--c-ink);
+
+            .header__actions .btn--outline-light {
+                border-color: rgba(12, 42, 77, 0.25);
+                color: var(--c-navy);
+
+                &:hover {
+                    background: var(--c-navy);
+                    color: var(--c-white);
+                    border-color: var(--c-navy);
+                }
+            }
         }
 
         .header__inner {
@@ -109,6 +120,17 @@
             display: flex;
             align-items: center;
             gap: 1.25rem;
+
+            .btn--outline-light {
+                border-color: rgba(255, 255, 255, 0.4);
+                color: var(--c-white);
+
+                &:hover {
+                    background: var(--c-white);
+                    color: var(--c-navy);
+                    border-color: var(--c-white);
+                }
+            }
         }
 
         .header__phone {
