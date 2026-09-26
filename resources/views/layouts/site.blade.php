@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <script>document.documentElement.classList.add('js-ready');</script>
 
         <x-seo-meta :seoable="$seoable ?? null" :title="$title ?? null" :description="$description ?? null" />
 
@@ -22,17 +23,20 @@
             <script>window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}gtag('js', new Date());gtag('config', '{{ $gaId }}');</script>
         @endif
 
+        @php
+            $schemaOrgData = [
+                '@context' => 'https://schema.org',
+                '@type' => 'Organization',
+                'name' => \App\Models\Setting::get('site_name', config('app.name')),
+                'url' => url('/'),
+                'logo' => \App\Models\Setting::get('logo_dark', \App\Models\Setting::get('logo')) ? \Illuminate\Support\Facades\Storage::disk('public')->url(\App\Models\Setting::get('logo_dark', \App\Models\Setting::get('logo'))) : null,
+                'telephone' => \App\Models\Setting::get('phone'),
+                'email' => \App\Models\Setting::get('email'),
+                'address' => \App\Models\Setting::get('address'),
+            ];
+        @endphp
         <script type="application/ld+json">
-        {!! json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'Organization',
-            'name' => \App\Models\Setting::get('site_name', config('app.name')),
-            'url' => url('/'),
-            'logo' => \App\Models\Setting::get('logo_dark', \App\Models\Setting::get('logo')) ? \Illuminate\Support\Facades\Storage::disk('public')->url(\App\Models\Setting::get('logo_dark', \App\Models\Setting::get('logo'))) : null,
-            'telephone' => \App\Models\Setting::get('phone'),
-            'email' => \App\Models\Setting::get('email'),
-            'address' => \App\Models\Setting::get('address'),
-        ]) !!}
+        {!! json_encode($schemaOrgData, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) !!}
         </script>
     </head>
     <body class="site">

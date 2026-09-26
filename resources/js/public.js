@@ -118,7 +118,7 @@ function initTextReveal() {
     const targets = document.querySelectorAll('[data-reveal-text]:not([data-reveal-init])');
     targets.forEach((el) => {
         el.setAttribute('data-reveal-init', 'true');
-        const span = el.querySelector(':scope > .line > span') || el;
+        const span = el.querySelector('.line > span') || el;
 
         gsap.fromTo(
             span,
@@ -144,7 +144,13 @@ function initScrollReveals() {
             y: 0,
             duration: 0.9,
             ease: 'power3.out',
-            scrollTrigger: { trigger: el, start: 'top 88%' },
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 92%',
+                once: true,
+                onEnter: () => el.classList.add('is-revealed'),
+            },
+            onComplete: () => el.classList.add('is-revealed'),
         });
     });
 
@@ -155,7 +161,13 @@ function initScrollReveals() {
             opacity: 1,
             duration: 1.1,
             ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 90%' },
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 94%',
+                once: true,
+                onEnter: () => el.classList.add('is-revealed'),
+            },
+            onComplete: () => el.classList.add('is-revealed'),
         });
     });
 
@@ -168,7 +180,7 @@ function initScrollReveals() {
             scale: 1,
             duration: 1.4,
             ease: 'power3.out',
-            scrollTrigger: { trigger: el, start: 'top 85%' },
+            scrollTrigger: { trigger: el, start: 'top 85%', once: true },
         });
     });
 }
@@ -183,13 +195,24 @@ function initCounters() {
         const suffix = el.dataset.countSuffix ?? '';
         const obj = { val: 0 };
 
+        // Animate counter from 0 to target on enter
         gsap.to(obj, {
             val: target,
             duration: 1.6,
             ease: 'power2.out',
-            scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+            scrollTrigger: {
+                trigger: el,
+                start: 'top 92%',
+                once: true,
+                onEnter: () => {
+                    el.textContent = '0' + suffix;
+                },
+            },
             onUpdate: () => {
                 el.textContent = Math.round(obj.val) + suffix;
+            },
+            onComplete: () => {
+                el.textContent = target + suffix;
             },
         });
     });
@@ -332,20 +355,59 @@ function initParallax() {
     });
 }
 
+function safeRun(name, fn) {
+    try {
+        fn();
+    } catch (err) {
+        console.warn(`[ACCO] Error in ${name}:`, err);
+    }
+}
+
 function initAll() {
-    initHeader();
-    initMobileMenu();
-    initTextReveal();
-    initScrollReveals();
-    initCounters();
-    initTestimonialSlider();
-    initAccordions();
-    initTabs();
-    initReadingProgress();
-    initTocHighlight();
-    initParallax();
-    ScrollTrigger.refresh();
+    safeRun('header', initHeader);
+    safeRun('mobileMenu', initMobileMenu);
+    safeRun('textReveal', initTextReveal);
+    safeRun('scrollReveals', initScrollReveals);
+    safeRun('counters', initCounters);
+    safeRun('testimonialSlider', initTestimonialSlider);
+    safeRun('accordions', initAccordions);
+    safeRun('tabs', initTabs);
+    safeRun('readingProgress', initReadingProgress);
+    safeRun('tocHighlight', initTocHighlight);
+    safeRun('parallax', initParallax);
+    safeRun('refresh', () => ScrollTrigger.refresh());
 }
 
 onReady(initAll);
 document.addEventListener('livewire:navigated', initAll);
+
+// Refresh ScrollTrigger once all images and stylesheets are fully loaded
+window.addEventListener('load', () => {
+    ScrollTrigger.refresh();
+});
+
+// Refresh ScrollTrigger when lazy-loaded images load
+document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+    if (!img.complete) {
+        img.addEventListener('load', () => {
+            ScrollTrigger.refresh();
+        }, { once: true });
+    }
+});
+
+// Failsafe: Ensure all elements are visible after 2.5 seconds regardless of scroll position
+setTimeout(() => {
+    document.querySelectorAll('.reveal-up:not(.is-revealed), .reveal-fade:not(.is-revealed)').forEach((el) => {
+        el.classList.add('is-revealed');
+        gsap.to(el, { opacity: 1, y: 0, duration: 0.4 });
+    });
+}, 2500);
+
+// Print / PDF export: Reveal all content immediately
+window.addEventListener('beforeprint', () => {
+    document.querySelectorAll('.reveal-up, .reveal-fade').forEach((el) => {
+        el.classList.add('is-revealed');
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+    });
+});

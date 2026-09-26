@@ -2,19 +2,60 @@
 
     // --- Reveal utilities (driven by GSAP ScrollTrigger in public.js) -----
 
+    // Default: Content is fully visible (100% fail-safe for no-JS, slow network, print, or unsupported browsers)
     .reveal-up {
-        opacity: 0;
-        transform: translateY(2.5rem);
+        opacity: 1;
+        transform: none;
+        transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
     }
 
     .reveal-fade {
-        opacity: 0;
+        opacity: 1;
+        transition: opacity var(--dur) var(--ease);
+    }
+
+    // Only apply the initial hidden state when JavaScript has confirmed execution via html.js-ready
+    html.js-ready & {
+        .reveal-up:not(.is-revealed) {
+            opacity: 0;
+            transform: translateY(2.5rem);
+        }
+
+        .reveal-fade:not(.is-revealed) {
+            opacity: 0;
+        }
+
+        .reveal-up.is-revealed,
+        .reveal-fade.is-revealed {
+            opacity: 1 !important;
+            transform: none !important;
+        }
     }
 
     .reveal-mask {
         overflow: hidden;
 
         img { transform: scale(1.15); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .reveal-up,
+        .reveal-fade,
+        .reveal-mask img {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+    }
+
+    @media print {
+        .reveal-up,
+        .reveal-fade,
+        .reveal-mask img {
+            opacity: 1 !important;
+            transform: none !important;
+            visibility: visible !important;
+        }
     }
 
     // --- Project detail: sticky sidebar + facts ----------------------------

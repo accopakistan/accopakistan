@@ -112,7 +112,32 @@
       "Bash(php -r ' *)",
       "Bash(mkdir -p storage/app/public/settings)",
       "Bash(cp public/images/ACCO-02.png storage/app/public/settings/logo-light.png)",
-      "Bash(cp public/images/ACCO-02-navy.png storage/app/public/settings/logo-dark.png)"
+      "Bash(cp public/images/ACCO-02-navy.png storage/app/public/settings/logo-dark.png)",
+      "Bash(echo \"diff exit: $?\")",
+      "Bash(php -l app/Services/AiAssistant/Tools/ServiceTools.php)",
+      "Bash(php -l app/Services/AiAssistant/Tools/ProjectTools.php)",
+      "Bash(php -l app/Services/AiAssistant/ConversationService.php)",
+      "Bash(php -l app/Models/Setting.php)",
+      "Bash(awk '{print $1}')",
+      "Bash(git ls-tree *)",
+      "Bash(php -l app/Console/Commands/RegenerateStockImages.php)",
+      "mcp__novamira-hospitaldesignhub-com__mcp-adapter-discover-abilities",
+      "mcp__novamira-hospitaldesignhub-com__mcp-adapter-execute-ability",
+      "mcp__novamira-hospitaldesignhub-com__mcp-adapter-get-ability-info",
+      "Bash(jq --version)",
+      "Bash(python3 -c ' *)",
+      "Bash(powershell -NoProfile -Command ' *)",
+      "Bash(sed -i '453s/color: white;/color: var\\(--text-on-accent\\);/' modern_custom.css)",
+      "Bash(sed -i '768s/color: #ffffff;/color: var\\(--text-on-accent\\);/' modern_custom.css)",
+      "Bash(sed -i '794s/color: white;/color: var\\(--text-on-accent\\);/' modern_custom.css)",
+      "Bash(sed -i '804s/color: white;/color: var\\(--text-on-accent\\);/' modern_custom.css)",
+      "Bash(grep -rn \"#[0-9A-Fa-f]\\\\{3,6\\\\}\" --include=\"*.blade.php\" .)",
+      "Bash(perl -0777 -pi -e 's/[ \\\\t]*\\\\$badgeClass = .badge-received.;\\\\n\\\\s*switch\\\\\\(\\\\$item->status\\\\\\) \\\\{\\\\n\\(?:.*\\\\n\\)*?\\\\s*\\\\}\\\\n\\\\n?//g' inquiries-results.blade.php)",
+      "Bash(perl -0777 -pi -e 's/\\\\{\\\\{ \\\\$badgeClass \\\\}\\\\}/{{ \\\\$item->status_badge_class }}/g' inquiries-results.blade.php)",
+      "Bash(php -l app/Models/Inquiry.php)",
+      "Bash(php -l app/Providers/AppServiceProvider.php)",
+      "Bash(grep -i \"^\\\\.env$\")",
+      "Bash(git rev-list *)"
     ]
   }
 }

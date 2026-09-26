@@ -44,10 +44,10 @@
     <section class="section section--tight" style="background:var(--c-navy);color:var(--c-white);">
         <div class="container">
             <div class="stats stats--dark">
-                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['years_experience'] }}" data-count-suffix="+">0</div><div class="stat__label">{{ __('Years Experience') }}</div></div>
-                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['projects_completed'] }}" data-count-suffix="+">0</div><div class="stat__label">{{ __('Projects Completed') }}</div></div>
-                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['happy_clients'] }}" data-count-suffix="+">0</div><div class="stat__label">{{ __('Happy Clients') }}</div></div>
-                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['awards_won'] }}" data-count-suffix="+">0</div><div class="stat__label">{{ __('Awards Won') }}</div></div>
+                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['years_experience'] }}" data-count-suffix="+">{{ $stats['years_experience'] }}+</div><div class="stat__label">{{ __('Years Experience') }}</div></div>
+                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['projects_completed'] }}" data-count-suffix="+">{{ $stats['projects_completed'] }}+</div><div class="stat__label">{{ __('Projects Completed') }}</div></div>
+                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['happy_clients'] }}" data-count-suffix="+">{{ $stats['happy_clients'] }}+</div><div class="stat__label">{{ __('Happy Clients') }}</div></div>
+                <div class="stat"><div class="stat__value num" data-count-to="{{ $stats['awards_won'] }}" data-count-suffix="+">{{ $stats['awards_won'] }}+</div><div class="stat__label">{{ __('Awards Won') }}</div></div>
             </div>
         </div>
     </section>
