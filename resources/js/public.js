@@ -136,38 +136,38 @@ function initTextReveal() {
 // --- Scroll reveals ------------------------------------------------------
 
 function initScrollReveals() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+
     const ups = document.querySelectorAll('.reveal-up:not([data-reveal-init])');
     ups.forEach((el) => {
         el.setAttribute('data-reveal-init', 'true');
-        gsap.to(el, {
-            opacity: 1,
-            y: 0,
-            duration: 0.9,
+        gsap.from(el, {
+            opacity: 0,
+            y: 35,
+            duration: 0.8,
             ease: 'power3.out',
             scrollTrigger: {
                 trigger: el,
                 start: 'top 92%',
                 once: true,
-                onEnter: () => el.classList.add('is-revealed'),
             },
-            onComplete: () => el.classList.add('is-revealed'),
         });
     });
 
     const fades = document.querySelectorAll('.reveal-fade:not([data-reveal-init])');
     fades.forEach((el) => {
         el.setAttribute('data-reveal-init', 'true');
-        gsap.to(el, {
-            opacity: 1,
-            duration: 1.1,
+        gsap.from(el, {
+            opacity: 0,
+            duration: 1.0,
             ease: 'power2.out',
             scrollTrigger: {
                 trigger: el,
                 start: 'top 94%',
                 once: true,
-                onEnter: () => el.classList.add('is-revealed'),
             },
-            onComplete: () => el.classList.add('is-revealed'),
         });
     });
 
@@ -395,19 +395,35 @@ document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
     }
 });
 
-// Failsafe: Ensure all elements are visible after 2.5 seconds regardless of scroll position
-setTimeout(() => {
-    document.querySelectorAll('.reveal-up:not(.is-revealed), .reveal-fade:not(.is-revealed)').forEach((el) => {
-        el.classList.add('is-revealed');
-        gsap.to(el, { opacity: 1, y: 0, duration: 0.4 });
-    });
-}, 2500);
+// Print / PDF export: Clear all active ScrollTriggers and GSAP transforms
+function cleanForPrint() {
+    try {
+        ScrollTrigger.getAll().forEach((t) => t.kill());
+        document.querySelectorAll('.reveal-up, .reveal-fade, .reveal-mask, .reveal-mask img, [data-reveal-text], [data-reveal-text] span, [data-reveal-text] .line').forEach((el) => {
+            gsap.set(el, { opacity: 1, y: 0, scale: 1, clearProps: 'all' });
+        });
+        document.querySelectorAll('[data-count-to]').forEach((el) => {
+            el.textContent = el.dataset.countTo + (el.dataset.countSuffix ?? '');
+        });
+    } catch (e) {}
+}
 
-// Print / PDF export: Reveal all content immediately
-window.addEventListener('beforeprint', () => {
+window.addEventListener('beforeprint', cleanForPrint);
+
+const printMedia = window.matchMedia('print');
+if (printMedia.addEventListener) {
+    printMedia.addEventListener('change', (e) => { if (e.matches) cleanForPrint(); });
+} else if (printMedia.addListener) {
+    printMedia.addListener((e) => { if (e.matches) cleanForPrint(); });
+}
+
+// Global safety fallback: Guarantee all elements are visible after 3 seconds
+setTimeout(() => {
     document.querySelectorAll('.reveal-up, .reveal-fade').forEach((el) => {
-        el.classList.add('is-revealed');
-        el.style.opacity = '1';
-        el.style.transform = 'none';
+        const style = window.getComputedStyle(el);
+        if (parseFloat(style.opacity) < 0.2) {
+            gsap.to(el, { opacity: 1, y: 0, duration: 0.3, clearProps: 'all' });
+        }
     });
-});
+}, 3000);
+
