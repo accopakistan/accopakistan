@@ -23,15 +23,36 @@ function initHeader() {
 
     const isTransparent = header.dataset.transparent === '1';
 
+    const getScrollTop = () =>
+        window.scrollY ||
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+
     const updateScroll = () => {
         if (!isTransparent) {
             header.classList.add('is-solid');
             return;
         }
-        header.classList.toggle('is-solid', window.scrollY > 40);
+        header.classList.toggle('is-solid', getScrollTop() > 20);
     };
     updateScroll();
     window.addEventListener('scroll', updateScroll, { passive: true });
+    document.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll, { passive: true });
+
+    try {
+        ScrollTrigger.create({
+            start: 'top -20',
+            end: 999999,
+            onUpdate: (self) => {
+                if (isTransparent) {
+                    header.classList.toggle('is-solid', self.scroll() > 20);
+                }
+            },
+        });
+    } catch (e) {}
 
     const triggers = header.querySelectorAll('[data-mega-trigger]');
     const megas = document.querySelectorAll('[data-mega]');
