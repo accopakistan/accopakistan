@@ -17,7 +17,10 @@ class HomeController extends Controller
         $featuredServices = Service::published()->where('is_featured', true)->orderBy('order')->get();
         $otherServices = Service::published()->where('is_featured', false)->orderBy('order')->get();
 
-        $featuredProjects = Project::published()->where('is_featured', true)->with('category')->orderBy('order')->limit(6)->get();
+        $featuredProjects = Project::published()->where('is_featured', true)->with('category')->orderBy('order')->limit(8)->get();
+        if ($featuredProjects->count() < 4) {
+            $featuredProjects = Project::published()->with('category')->orderBy('order')->limit(8)->get();
+        }
         $flagshipProject = $featuredProjects->first();
 
         $industries = collect(range(1, 6))->map(fn ($i) => [

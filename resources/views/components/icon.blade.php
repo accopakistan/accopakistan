@@ -3,9 +3,12 @@
 @php
     $paths = [
         'arrow-right' => '<line x1="4" y1="12" x2="20" y2="12"/><polyline points="13 5 20 12 13 19"/>',
+        'arrow-left' => '<line x1="20" y1="12" x2="4" y2="12"/><polyline points="11 19 4 12 11 5"/>',
         'arrow-up-right' => '<line x1="6" y1="18" x2="18" y2="6"/><polyline points="8 6 18 6 18 16"/>',
         'chevron-down' => '<polyline points="5 8 12 15 19 8"/>',
         'chevron-up' => '<polyline points="5 16 12 9 19 16"/>',
+        'chevron-left' => '<polyline points="15 18 9 12 15 6"/>',
+        'chevron-right' => '<polyline points="9 18 15 12 9 6"/>',
         'x' => '<line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>',
         'plus' => '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
         'phone' => '<path d="M4 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L14 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 2 6a2 2 0 0 1 2-2z"/>',

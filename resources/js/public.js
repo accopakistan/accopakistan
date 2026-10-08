@@ -267,6 +267,140 @@ function initTestimonialSlider() {
     });
 }
 
+// --- Featured Projects Carousel -------------------------------------------
+
+function initProjectCarousel() {
+    const carousels = document.querySelectorAll('[data-project-carousel]:not([data-carousel-init])');
+    carousels.forEach((container) => {
+        container.setAttribute('data-carousel-init', 'true');
+        const track = container.querySelector('[data-project-track]');
+        const slides = container.querySelectorAll('[data-project-slide]');
+        const prevBtn = document.querySelector('[data-proj-prev]');
+        const nextBtn = document.querySelector('[data-proj-next]');
+        const currentCounter = document.querySelector('[data-proj-counter-current]');
+        const progressBar = container.querySelector('[data-proj-progress]');
+        const dots = container.querySelectorAll('[data-proj-dot]');
+
+        if (!track || !slides.length) return;
+
+        let currentIndex = 0;
+        const total = slides.length;
+
+        const updateUI = (index) => {
+            currentIndex = Math.max(0, Math.min(index, total - 1));
+
+            if (currentCounter) {
+                currentCounter.textContent = String(currentIndex + 1).padStart(2, '0');
+            }
+
+            if (progressBar) {
+                const percent = ((currentIndex + 1) / total) * 100;
+                progressBar.style.width = `${percent}%`;
+            }
+
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('is-active', i === currentIndex);
+            });
+
+            if (prevBtn) {
+                prevBtn.disabled = currentIndex === 0;
+            }
+            if (nextBtn) {
+                nextBtn.disabled = currentIndex === total - 1;
+            }
+        };
+
+        const scrollToIndex = (index) => {
+            const target = slides[index];
+            if (!target) return;
+            const trackRect = track.getBoundingClientRect();
+            const targetRect = target.getBoundingClientRect();
+            const targetLeft = track.scrollLeft + (targetRect.left - trackRect.left);
+
+            track.scrollTo({
+                left: targetLeft,
+                behavior: 'smooth',
+            });
+            updateUI(index);
+        };
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                scrollToIndex(currentIndex - 1);
+            });
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                scrollToIndex(currentIndex + 1);
+            });
+        }
+
+        dots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.dataset.projDot, 10);
+                if (!isNaN(idx)) scrollToIndex(idx);
+            });
+        });
+
+        let scrollTimeout = null;
+        track.addEventListener('scroll', () => {
+            if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
+            scrollTimeout = requestAnimationFrame(() => {
+                const scrollLeft = track.scrollLeft;
+                let closestIndex = 0;
+                let minDistance = Infinity;
+
+                slides.forEach((slide, i) => {
+                    const distance = Math.abs(slide.offsetLeft - track.offsetLeft - scrollLeft);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestIndex = i;
+                    }
+                });
+
+                if (closestIndex !== currentIndex) {
+                    updateUI(closestIndex);
+                }
+            });
+        }, { passive: true });
+
+        // Mouse Drag to scroll
+        let isDown = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        track.addEventListener('mousedown', (e) => {
+            isDown = true;
+            startX = e.pageX - track.offsetLeft;
+            startScrollLeft = track.scrollLeft;
+            track.style.scrollBehavior = 'auto';
+        });
+
+        track.addEventListener('mouseleave', () => {
+            if (!isDown) return;
+            isDown = false;
+            track.style.scrollBehavior = 'smooth';
+        });
+
+        track.addEventListener('mouseup', () => {
+            if (!isDown) return;
+            isDown = false;
+            track.style.scrollBehavior = 'smooth';
+        });
+
+        track.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - track.offsetLeft;
+            const walk = (x - startX) * 1.5;
+            track.scrollLeft = startScrollLeft - walk;
+        });
+
+        updateUI(0);
+    });
+}
+
 // --- Accordion (FAQ) ------------------------------------------------------
 
 function initAccordions() {
@@ -391,6 +525,7 @@ function initAll() {
     safeRun('scrollReveals', initScrollReveals);
     safeRun('counters', initCounters);
     safeRun('testimonialSlider', initTestimonialSlider);
+    safeRun('projectCarousel', initProjectCarousel);
     safeRun('accordions', initAccordions);
     safeRun('tabs', initTabs);
     safeRun('readingProgress', initReadingProgress);

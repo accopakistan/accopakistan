@@ -122,38 +122,109 @@
         </section>
     @endif
 
-    {{-- ============================== FEATURED PROJECTS ============================== --}}
+    {{-- ============================== FEATURED PROJECTS CAROUSEL ============================== --}}
     @if ($featuredProjects->isNotEmpty())
-        <section class="section">
+        <section class="section section--projects-carousel">
             <div class="container">
-                <div class="section-head">
+                <div class="section-head section-head--carousel">
                     <div class="section-head__text reveal-up">
                         <div class="eyebrow">{{ __('Our Work') }}</div>
-                        <h2 class="display-2" style="margin-top:1rem;">{{ __('Featured Projects') }}</h2>
+                        <h2 class="display-2" style="margin-top:0.75rem;">{{ __('Featured Projects') }}</h2>
+                        <p class="lede" style="margin-top:0.75rem;max-width:38rem;">{{ __('Signature commercial, healthcare, industrial, and residential landmarks delivered across Pakistan.') }}</p>
                     </div>
-                    <a href="{{ route('projects.index') }}" class="btn--ghost reveal-up" style="display:inline-flex;align-items:center;gap:0.4rem;">
-                        {{ __('View All Projects') }} <x-icon name="arrow-right" />
-                    </a>
-                </div>
-                <div class="project-grid">
-                    @foreach ($featuredProjects as $index => $project)
-                        <a href="{{ route('projects.show', $project) }}" class="project-tile reveal-up {{ $index === 0 ? 'is-wide' : ($index === 3 ? 'is-narrow' : '') }}">
-                            <div class="project-tile__media">
-                                @if ($project->featuredImageUrl())
-                                    <img src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}" loading="lazy">
-                                @else
-                                    <img src="https://picsum.photos/seed/acco-proj-{{ $project->id }}/900/1100" alt="{{ $project->title }}" loading="lazy">
-                                @endif
-                            </div>
-                            <div class="project-tile__overlay">
-                                @if ($project->category)
-                                    <div class="project-tile__cat">{{ $project->category->name }}</div>
-                                @endif
-                                <div class="project-tile__title">{{ $project->title }}</div>
-                                <div class="project-tile__loc">{{ $project->location }}</div>
-                            </div>
+                    <div class="carousel-head-actions reveal-up">
+                        <a href="{{ route('projects.index') }}" class="btn--ghost d-none-mobile" style="display:inline-flex;align-items:center;gap:0.4rem;">
+                            {{ __('View All Projects') }} <x-icon name="arrow-right" />
                         </a>
+                        <div class="carousel-controls">
+                            <div class="carousel-counter">
+                                <span class="carousel-counter__current" data-proj-counter-current>01</span>
+                                <span class="carousel-counter__sep">/</span>
+                                <span class="carousel-counter__total">{{ sprintf('%02d', $featuredProjects->count()) }}</span>
+                            </div>
+                            <div class="carousel-nav-group">
+                                <button type="button" class="carousel-nav-btn" data-proj-prev aria-label="{{ __('Previous Project') }}">
+                                    <x-icon name="arrow-left" />
+                                </button>
+                                <button type="button" class="carousel-nav-btn" data-proj-next aria-label="{{ __('Next Project') }}">
+                                    <x-icon name="arrow-right" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-carousel-container container" data-project-carousel>
+                <div class="project-carousel-track" data-project-track tabindex="0" role="region" aria-label="{{ __('Featured Projects Carousel') }}">
+                    @foreach ($featuredProjects as $index => $project)
+                        <div class="project-carousel-slide reveal-up" data-project-slide data-index="{{ $index }}">
+                            <article class="proj-card">
+                                <div class="proj-card__media-wrap">
+                                    <a href="{{ route('projects.show', $project) }}" class="proj-card__media-link" tabindex="-1">
+                                        @if ($project->featuredImageUrl())
+                                            <img src="{{ $project->featuredImageUrl() }}" alt="{{ $project->title }}" loading="lazy" class="proj-card__img">
+                                        @else
+                                            <img src="https://picsum.photos/seed/acco-proj-{{ $project->id }}/1200/900" alt="{{ $project->title }}" loading="lazy" class="proj-card__img">
+                                        @endif
+                                    </a>
+                                    <div class="proj-card__badges">
+                                        @if ($project->category)
+                                            <span class="proj-card__badge">{{ $project->category->name }}</span>
+                                        @endif
+                                        @if ($project->completion_date)
+                                            <span class="proj-card__year">{{ $project->completion_date->format('Y') }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="proj-card__content">
+                                    <div class="proj-card__meta">
+                                        @if ($project->location)
+                                            <span class="proj-card__meta-item">
+                                                <x-icon name="map-pin" style="width:0.85rem;height:0.85rem;" />
+                                                {{ $project->location }}
+                                            </span>
+                                        @endif
+                                        @if ($project->area)
+                                            <span class="proj-card__meta-item">
+                                                <x-icon name="building" style="width:0.85rem;height:0.85rem;" />
+                                                {{ $project->area }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <h3 class="proj-card__title">
+                                        <a href="{{ route('projects.show', $project) }}">{{ $project->title }}</a>
+                                    </h3>
+
+                                    @if ($project->excerpt)
+                                        <p class="proj-card__excerpt">{{ Str::limit($project->excerpt, 110) }}</p>
+                                    @endif
+
+                                    <div class="proj-card__footer">
+                                        <a href="{{ route('projects.show', $project) }}" class="proj-card__cta">
+                                            <span>{{ __('Explore Project') }}</span>
+                                            <span class="proj-card__cta-icon">
+                                                <x-icon name="arrow-up-right" style="width:0.95rem;height:0.95rem;" />
+                                            </span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
                     @endforeach
+                </div>
+
+                <div class="project-carousel-bottom reveal-up">
+                    <div class="project-carousel-progress">
+                        <div class="project-carousel-progress__bar" data-proj-progress></div>
+                    </div>
+                    <div class="project-carousel-dots" data-proj-dots>
+                        @foreach ($featuredProjects as $index => $project)
+                            <button type="button" class="project-carousel-dot {{ $index === 0 ? 'is-active' : '' }}" data-proj-dot="{{ $index }}" aria-label="{{ __('Go to project slide :num', ['num' => $index + 1]) }}"></button>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </section>
