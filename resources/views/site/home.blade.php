@@ -155,10 +155,10 @@
                 </div>
             </div>
 
-            <div class="project-carousel-container container" data-project-carousel>
+            <div class="project-carousel-container container reveal-up" data-project-carousel>
                 <div class="project-carousel-track" data-project-track tabindex="0" role="region" aria-label="{{ __('Featured Projects Carousel') }}">
                     @foreach ($featuredProjects as $index => $project)
-                        <div class="project-carousel-slide reveal-up" data-project-slide data-index="{{ $index }}">
+                        <div class="project-carousel-slide" data-project-slide data-index="{{ $index }}">
                             <article class="proj-card">
                                 <div class="proj-card__media-wrap">
                                     <a href="{{ route('projects.show', $project) }}" class="proj-card__media-link" tabindex="-1">
@@ -216,7 +216,7 @@
                     @endforeach
                 </div>
 
-                <div class="project-carousel-bottom reveal-up">
+                <div class="project-carousel-bottom">
                     <div class="project-carousel-progress">
                         <div class="project-carousel-progress__bar" data-proj-progress></div>
                     </div>

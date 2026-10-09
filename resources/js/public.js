@@ -274,130 +274,306 @@ function initProjectCarousel() {
     carousels.forEach((container) => {
         container.setAttribute('data-carousel-init', 'true');
         const track = container.querySelector('[data-project-track]');
-        const slides = container.querySelectorAll('[data-project-slide]');
+        const originalSlides = Array.from(container.querySelectorAll('[data-project-slide]'));
         const prevBtn = document.querySelector('[data-proj-prev]');
         const nextBtn = document.querySelector('[data-proj-next]');
         const currentCounter = document.querySelector('[data-proj-counter-current]');
         const progressBar = container.querySelector('[data-proj-progress]');
         const dots = container.querySelectorAll('[data-proj-dot]');
 
-        if (!track || !slides.length) return;
+        if (!track || !originalSlides.length) return;
 
-        let currentIndex = 0;
-        const total = slides.length;
+        const totalOriginals = originalSlides.length;
 
-        const updateUI = (index) => {
-            currentIndex = Math.max(0, Math.min(index, total - 1));
+        // If only 1 project, no auto-move or looping needed
+        if (totalOriginals <= 1) {
+            if (prevBtn) prevBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+            if (progressBar) progressBar.style.width = '100%';
+            return;
+        }
+
+        // Buffer clones (clone enough to cover any screen width and allow smooth wrap-around)
+        const clonesCount = Math.min(totalOriginals, 4);
+
+        // Prepend clones of the end slides
+        const startClones = [];
+        for (let i = totalOriginals - clonesCount; i < totalOriginals; i++) {
+            const clone = originalSlides[i].cloneNode(true);
+            clone.setAttribute('data-project-clone', 'true');
+            clone.setAttribute('aria-hidden', 'true');
+            clone.querySelectorAll('a, button').forEach(el => el.setAttribute('tabindex', '-1'));
+            startClones.push(clone);
+        }
+        startClones.forEach(clone => track.insertBefore(clone, track.firstChild));
+
+        // Append clones of the start slides
+        const endClones = [];
+        for (let i = 0; i < clonesCount; i++) {
+            const clone = originalSlides[i].cloneNode(true);
+            clone.setAttribute('data-project-clone', 'true');
+            clone.setAttribute('aria-hidden', 'true');
+            clone.querySelectorAll('a, button').forEach(el => el.setAttribute('tabindex', '-1'));
+            endClones.push(clone);
+        }
+        endClones.forEach(clone => track.appendChild(clone));
+
+        let currentIndex = clonesCount; // Start at the first original slide
+        let isAnimating = false;
+        let animSafetyTimer = null;
+        let autoplayTimer = null;
+        const AUTOPLAY_INTERVAL = 4000;
+
+        const getAllSlides = () => track.querySelectorAll('[data-project-slide]');
+
+        const getSlideOffset = (idx) => {
+            const slides = getAllSlides();
+            if (!slides[idx]) return 0;
+            const first = slides[0];
+            return slides[idx].offsetLeft - first.offsetLeft;
+        };
+
+        const updateUI = () => {
+            let realIndex = (currentIndex - clonesCount) % totalOriginals;
+            if (realIndex < 0) realIndex += totalOriginals;
 
             if (currentCounter) {
-                currentCounter.textContent = String(currentIndex + 1).padStart(2, '0');
+                currentCounter.textContent = String(realIndex + 1).padStart(2, '0');
             }
 
             if (progressBar) {
-                const percent = ((currentIndex + 1) / total) * 100;
+                const percent = ((realIndex + 1) / totalOriginals) * 100;
                 progressBar.style.width = `${percent}%`;
             }
 
             dots.forEach((dot, i) => {
-                dot.classList.toggle('is-active', i === currentIndex);
+                dot.classList.toggle('is-active', i === realIndex);
             });
 
-            if (prevBtn) {
-                prevBtn.disabled = currentIndex === 0;
-            }
-            if (nextBtn) {
-                nextBtn.disabled = currentIndex === total - 1;
+            // Loop is continuous, buttons remain active
+            if (prevBtn) prevBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
+        };
+
+        const silentJump = (idx) => {
+            track.style.transition = 'none';
+            const offset = getSlideOffset(idx);
+            track.style.transform = `translate3d(-${offset}px, 0, 0)`;
+            void track.offsetHeight; // force reflow
+            track.style.transition = '';
+        };
+
+        const handleTransitionEnd = () => {
+            clearTimeout(animSafetyTimer);
+            isAnimating = false;
+
+            // Seamless infinite wrap-around
+            if (currentIndex >= clonesCount + totalOriginals) {
+                currentIndex -= totalOriginals;
+                silentJump(currentIndex);
+            } else if (currentIndex < clonesCount) {
+                currentIndex += totalOriginals;
+                silentJump(currentIndex);
             }
         };
 
-        const scrollToIndex = (index) => {
-            const target = slides[index];
-            if (!target) return;
-            const trackRect = track.getBoundingClientRect();
-            const targetRect = target.getBoundingClientRect();
-            const targetLeft = track.scrollLeft + (targetRect.left - trackRect.left);
+        const goToIndex = (targetIdx, animate = true) => {
+            if (isAnimating && animate) return;
 
-            track.scrollTo({
-                left: targetLeft,
-                behavior: 'smooth',
-            });
-            updateUI(index);
+            currentIndex = targetIdx;
+            const offset = getSlideOffset(currentIndex);
+
+            if (animate) {
+                isAnimating = true;
+                track.style.transition = 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)';
+                track.style.transform = `translate3d(-${offset}px, 0, 0)`;
+
+                clearTimeout(animSafetyTimer);
+                animSafetyTimer = setTimeout(() => {
+                    handleTransitionEnd();
+                }, 750);
+            } else {
+                silentJump(currentIndex);
+            }
+
+            updateUI();
         };
 
+        track.addEventListener('transitionend', (e) => {
+            if (e.target === track && e.propertyName === 'transform') {
+                handleTransitionEnd();
+            }
+        });
+
+        // Autoplay
+        const startAutoplay = () => {
+            stopAutoplay();
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            autoplayTimer = setInterval(() => {
+                goToIndex(currentIndex + 1, true);
+            }, AUTOPLAY_INTERVAL);
+        };
+
+        const stopAutoplay = () => {
+            if (autoplayTimer) {
+                clearInterval(autoplayTimer);
+                autoplayTimer = null;
+            }
+        };
+
+        const restartAutoplay = () => {
+            stopAutoplay();
+            startAutoplay();
+        };
+
+        // Navigation controls
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
-                scrollToIndex(currentIndex - 1);
+                goToIndex(currentIndex - 1, true);
+                restartAutoplay();
             });
         }
 
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
-                scrollToIndex(currentIndex + 1);
+                goToIndex(currentIndex + 1, true);
+                restartAutoplay();
             });
         }
 
+        // Pagination dots
         dots.forEach((dot) => {
             dot.addEventListener('click', () => {
                 const idx = parseInt(dot.dataset.projDot, 10);
-                if (!isNaN(idx)) scrollToIndex(idx);
-            });
-        });
-
-        let scrollTimeout = null;
-        track.addEventListener('scroll', () => {
-            if (scrollTimeout) cancelAnimationFrame(scrollTimeout);
-            scrollTimeout = requestAnimationFrame(() => {
-                const scrollLeft = track.scrollLeft;
-                let closestIndex = 0;
-                let minDistance = Infinity;
-
-                slides.forEach((slide, i) => {
-                    const distance = Math.abs(slide.offsetLeft - track.offsetLeft - scrollLeft);
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestIndex = i;
-                    }
-                });
-
-                if (closestIndex !== currentIndex) {
-                    updateUI(closestIndex);
+                if (!isNaN(idx)) {
+                    goToIndex(clonesCount + idx, true);
+                    restartAutoplay();
                 }
             });
-        }, { passive: true });
+        });
 
-        // Mouse Drag to scroll
-        let isDown = false;
+        // Pause on mouse hover (cards, container, or header controls)
+        container.addEventListener('mouseenter', stopAutoplay);
+        container.addEventListener('mouseleave', () => {
+            if (!isPointerDown) startAutoplay();
+        });
+
+        const headActions = document.querySelector('.carousel-head-actions');
+        if (headActions) {
+            headActions.addEventListener('mouseenter', stopAutoplay);
+            headActions.addEventListener('mouseleave', () => {
+                if (!isPointerDown) startAutoplay();
+            });
+        }
+
+        // Pause when browser tab is inactive
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoplay();
+            } else {
+                startAutoplay();
+            }
+        });
+
+        // Interactive Drag / Touch gesture support
+        let isPointerDown = false;
         let startX = 0;
-        let startScrollLeft = 0;
+        let startY = 0;
+        let initialOffset = 0;
+        let movedDistance = 0;
+        let isHorizontalSwipe = null;
 
-        track.addEventListener('mousedown', (e) => {
-            isDown = true;
-            startX = e.pageX - track.offsetLeft;
-            startScrollLeft = track.scrollLeft;
-            track.style.scrollBehavior = 'auto';
+        const onPointerDown = (e) => {
+            if (e.button && e.button !== 0) return;
+            isPointerDown = true;
+            movedDistance = 0;
+            isHorizontalSwipe = null;
+            startX = e.pageX ?? e.touches?.[0]?.pageX ?? 0;
+            startY = e.pageY ?? e.touches?.[0]?.pageY ?? 0;
+            initialOffset = getSlideOffset(currentIndex);
+            stopAutoplay();
+            track.style.transition = 'none';
+        };
+
+        const onPointerMove = (e) => {
+            if (!isPointerDown) return;
+            const currentX = e.pageX ?? e.touches?.[0]?.pageX ?? startX;
+            const currentY = e.pageY ?? e.touches?.[0]?.pageY ?? startY;
+            const diffX = currentX - startX;
+            const diffY = currentY - startY;
+
+            if (isHorizontalSwipe === null && (Math.abs(diffX) > 6 || Math.abs(diffY) > 6)) {
+                isHorizontalSwipe = Math.abs(diffX) >= Math.abs(diffY);
+            }
+
+            if (isHorizontalSwipe === false) {
+                return;
+            }
+
+            if (e.cancelable && isHorizontalSwipe === true) {
+                e.preventDefault();
+            }
+
+            movedDistance = Math.abs(diffX);
+            const newOffset = initialOffset - diffX;
+            track.style.transform = `translate3d(-${newOffset}px, 0, 0)`;
+        };
+
+        const onPointerUp = (e) => {
+            if (!isPointerDown) return;
+            isPointerDown = false;
+            const endX = e.pageX ?? e.changedTouches?.[0]?.pageX ?? startX;
+            const diffX = endX - startX;
+
+            track.style.transition = '';
+
+            if (isHorizontalSwipe === true && Math.abs(diffX) > 50) {
+                if (diffX < 0) {
+                    goToIndex(currentIndex + 1, true);
+                } else {
+                    goToIndex(currentIndex - 1, true);
+                }
+            } else {
+                goToIndex(currentIndex, true);
+            }
+
+            startAutoplay();
+        };
+
+        // Desktop mouse drag
+        track.addEventListener('mousedown', onPointerDown);
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+
+        // Mobile touch swipe
+        track.addEventListener('touchstart', onPointerDown, { passive: true });
+        track.addEventListener('touchmove', onPointerMove, { passive: false });
+        track.addEventListener('touchend', onPointerUp, { passive: true });
+        track.addEventListener('touchcancel', onPointerUp, { passive: true });
+
+        // Prevent unintentional link clicks while dragging
+        track.addEventListener('click', (e) => {
+            if (movedDistance > 8) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
+        // Window resize adjustment
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            track.style.transition = 'none';
+            silentJump(currentIndex);
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                track.style.transition = '';
+            }, 100);
         });
 
-        track.addEventListener('mouseleave', () => {
-            if (!isDown) return;
-            isDown = false;
-            track.style.scrollBehavior = 'smooth';
-        });
-
-        track.addEventListener('mouseup', () => {
-            if (!isDown) return;
-            isDown = false;
-            track.style.scrollBehavior = 'smooth';
-        });
-
-        track.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
-            const x = e.pageX - track.offsetLeft;
-            const walk = (x - startX) * 1.5;
-            track.scrollLeft = startScrollLeft - walk;
-        });
-
-        updateUI(0);
+        // Initialize position, UI state, and autoplay
+        silentJump(currentIndex);
+        updateUI();
+        startAutoplay();
     });
 }
 

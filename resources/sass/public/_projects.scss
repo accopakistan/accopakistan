@@ -67,6 +67,9 @@
             transform: scale(1);
             transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
             display: block;
+            user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
         }
     }
 
@@ -338,24 +341,19 @@
 
     .project-carousel-container {
         position: relative;
+        overflow: hidden;
+        padding-block: 0.75rem 1.75rem;
     }
 
     .project-carousel-track {
         display: flex;
         gap: clamp(1.25rem, 2.5vw, 2.25rem);
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        padding-block: 0.5rem 1.5rem;
-        margin-inline: -0.5rem;
-        padding-inline: 0.5rem;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
+        padding-inline: 0.25rem;
+        will-change: transform;
+        touch-action: pan-y;
         cursor: grab;
-
-        &::-webkit-scrollbar {
-            display: none;
-        }
+        user-select: none;
+        -webkit-user-select: none;
 
         &:active {
             cursor: grabbing;
@@ -364,8 +362,9 @@
 
     .project-carousel-slide {
         flex: 0 0 auto;
-        scroll-snap-align: start;
         width: clamp(340px, 42vw, 520px);
+        user-select: none;
+        -webkit-user-select: none;
 
         @media (max-width: 900px) {
             width: clamp(300px, 65vw, 440px);
